@@ -1,0 +1,24 @@
+{
+    "os": "Linux-4.15.0-142-generic-x86_64-with-glibc2.17",
+    "python": "3.8.10",
+    "heartbeatAt": "2021-10-06T13:53:27.246291",
+    "startedAt": "2021-10-06T13:53:26.307432",
+    "docker": null,
+    "gpu": "Quadro K4200",
+    "gpu_count": 1,
+    "cpu_count": 16,
+    "cuda": "9.2.148",
+    "args": [],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "train.py",
+    "git": {
+        "remote": "https://github.com/arielherreraaguiar/Stablizer.git",
+        "commit": "fb0eb2060769cdfebe1f1e34a87c336aa594396b"
+    },
+    "email": "arielmh.herrera@gmail.com",
+    "root": "/home/inge/Pytorch-UNet",
+    "host": "inge-Work",
+    "username": "inge",
+    "executable": "/home/inge/anaconda3/envs/unet/bin/python"
+}

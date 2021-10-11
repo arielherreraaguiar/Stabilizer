@@ -64,7 +64,7 @@ def get_args():
 def get_output_filenames(args):
     def _generate_name(fn):
         split = os.path.splitext(fn)
-        return f'{split[0]}_OUT{split[1]}'
+        return "{}_OUT{}".format(split[0],split[1])
 
     return args.output or list(map(_generate_name, args.input))
 
@@ -84,8 +84,8 @@ if __name__ == '__main__':
     net = UNet(n_channels=3, n_classes=2)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    logging.info(f'Loading model {args.model}')
-    logging.info(f'Using device {device}')
+    logging.info('Loading model {}'.format(args.model))
+    logging.info('Using device {}'.format(device))
 
     net.to(device=device)
     net.load_state_dict(torch.load(args.model, map_location=device))
@@ -93,7 +93,8 @@ if __name__ == '__main__':
     logging.info('Model loaded!')
 
     for i, filename in enumerate(in_files):
-        logging.info(f'\nPredicting image {filename} ...')
+        #logging.info(f'\nPredicting image {filename} ...')
+        logging.info('\nPredicting image {} ...'.format(filename))
         img = Image.open(filename)
 
         mask = predict_img(net=net,
@@ -106,8 +107,9 @@ if __name__ == '__main__':
             out_filename = out_files[i]
             result = mask_to_image(mask)
             result.save(out_filename)
-            logging.info(f'Mask saved to {out_filename}')
+            logging.info('Mask saved to {}'.format(out_filename))
 
         if args.viz:
-            logging.info(f'Visualizing results for image {filename}, close to continue...')
+            #logging.info(f'Visualizing results for image {filename}, close to continue...')
+            logging.info('Visualizing results for image {},close to continue...'.format(filename))
             plot_img_and_mask(img, mask)

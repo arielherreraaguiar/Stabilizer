@@ -19,8 +19,8 @@ class BasicDataset(Dataset):
 
         self.ids = [splitext(file)[0] for file in listdir(images_dir) if not file.startswith('.')]
         if not self.ids:
-            raise RuntimeError(f'No input file found in {images_dir}, make sure you put your images there')
-        logging.info(f'Creating dataset with {len(self.ids)} examples')
+            raise RuntimeError('No input file found in {}, make sure you put your images there'.format(images_dir))
+        logging.info('Creating dataset with {} examples'.format(len(self.ids)))
 
     def __len__(self):
         return len(self.ids)
@@ -58,13 +58,13 @@ class BasicDataset(Dataset):
         mask_file = list(self.masks_dir.glob(name + self.mask_suffix + '.*'))
         img_file = list(self.images_dir.glob(name + '.*'))
 
-        assert len(mask_file) == 1, f'Either no mask or multiple masks found for the ID {name}: {mask_file}'
-        assert len(img_file) == 1, f'Either no image or multiple images found for the ID {name}: {img_file}'
+        assert len(mask_file) == 1, 'Either no mask or multiple masks found for the ID {}:{}'.format(name,mask_file)
+        assert len(img_file) == 1, 'Either no image or multiple images found for the ID {}:{}'.format(name,img_file)
         mask = self.load(mask_file[0])
         img = self.load(img_file[0])
 
         assert img.size == mask.size, \
-            'Image and mask {name} should be the same size, but are {img.size} and {mask.size}'
+            'Image and mask {} should be the same size, but are {} and {}'.format(name,img.size,mask.size)
 
         img = self.preprocess(img, self.scale, is_mask=False)
         mask = self.preprocess(mask, self.scale, is_mask=True)
