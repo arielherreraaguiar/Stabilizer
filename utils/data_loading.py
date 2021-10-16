@@ -1,4 +1,5 @@
 import logging
+import os
 from os import listdir
 from os.path import splitext
 from pathlib import Path
@@ -8,18 +9,21 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
+from glob import glob
+
 
 class BasicDataset(Dataset):
     def __init__(self, images_dir: str, masks_dir: str, scale: float = 1.0, mask_suffix: str = ''):
         self.images_dir = Path(images_dir)
+        #i=str(self.images_dir)
         self.masks_dir = Path(masks_dir)
         assert 0 < scale <= 1, 'Scale must be between 0 and 1'
         self.scale = scale
         self.mask_suffix = mask_suffix
 
-        self.ids = [splitext(file)[0] for file in listdir(images_dir) if not file.startswith('.')]
+        self.ids = [splitext(file)[0] for file in listdir(masks_dir) if not file.startswith('.')]
         if not self.ids:
-            raise RuntimeError('No input file found in {}, make sure you put your images there'.format(images_dir))
+            raise RuntimeError('No input file found in {}, make sure you put your images there'.format(masks_dir))
         logging.info('Creating dataset with {} examples'.format(len(self.ids)))
 
     def __len__(self):
@@ -55,26 +59,38 @@ class BasicDataset(Dataset):
 
     def __getitem__(self, idx):
         name = self.ids[idx]
-        mask_file = list(self.masks_dir.glob(name + self.mask_suffix + '.*'))
-        img_file = list(self.images_dir.glob(name + '.*'))
+        #mask_file = list(self.masks_dir.glob(name + self.mask_suffix + '.*'))
+        
+        #assert len(mask_file) == 1, 'Either no mask or multiple masks found for the ID {}:{}'.format(name,mask_file)
+        #assert len(img_file) == 1, 'Either no image or multiple images found for the ID {}:{}'.format(name,img_file) 
 
-        assert len(mask_file) == 1, 'Either no mask or multiple masks found for the ID {}:{}'.format(name,mask_file)
-        assert len(img_file) == 1, 'Either no image or multiple images found for the ID {}:{}'.format(name,img_file)
-        mask = self.load(mask_file[0])
-        img = self.load(img_file[0])
-
-        assert img.size == mask.size, \
-            'Image and mask {} should be the same size, but are {} and {}'.format(name,img.size,mask.size)
-
-        img = self.preprocess(img, self.scale, is_mask=False)
-        mask = self.preprocess(mask, self.scale, is_mask=True)
-
-        return {
-            'image': torch.as_tensor(img.copy()).float().contiguous(),
-            'mask': torch.as_tensor(mask.copy()).long().contiguous()
-        }
+        for i in self.images_dir.glob(name):
+            for k in self.masks_dir.glob(name+ self.mask_suffix + '.*'):
+                mask = self.load(k) 
 
 
-class CarvanaDataset(BasicDataset):
+            for j in i.glob('*/'):
+
+             
+       
+                img = self.load(j)
+
+             
+                
+
+                assert img.size == mask.size, \
+                    'Image and mask {} should be the same size, but are {} and {}'.format(name,img.size,mask.size)
+
+                img = self.preprocess(img, self.scale, is_mask=False)
+                mask = self.preprocess(mask, self.scale, is_mask=True)
+
+                return {
+                    'image': torch.as_tensor(img.copy()).float().contiguous(),
+                    'mask': torch.as_tensor(mask.copy()).long().contiguous()
+                }
+
+
+class SkyDataset(BasicDataset):
     def __init__(self, images_dir, masks_dir, scale=1):
-        super().__init__(images_dir, masks_dir, scale, mask_suffix='_mask')
+        #super().__init__(images_dir, masks_dir, scale, mask_suffix='_mask')
+        super().__init__(images_dir, masks_dir, scale, mask_suffix='')

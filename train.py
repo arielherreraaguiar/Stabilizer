@@ -11,20 +11,20 @@ from torch import optim
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
-from utils.data_loading import BasicDataset, CarvanaDataset
+from utils.data_loading import BasicDataset, SkyDataset
 from utils.dice_score import dice_loss
 from evaluate import evaluate
 from unet import UNet
 
-dir_img = Path('./data/imgs/')
+dir_img = Path('/home/inge/Pytorch-UNet/data/imgs/skyfinder_images/')
 #print(dir_img)
-dir_mask = Path('./data/masks/')
+dir_mask = Path('/home/inge/Pytorch-UNet/data/masks/skyfinder_masks')
 dir_checkpoint = Path('./checkpoints/')
 
 
 def train_net(net,
               device,
-              epochs: int = 5,
+              epochs: int = 1,
               batch_size: int = 1,
               learning_rate: float = 0.001,
               val_percent: float = 0.1,
@@ -33,7 +33,7 @@ def train_net(net,
               amp: bool = False):
     # 1. Create dataset
     try:
-        dataset = CarvanaDataset(dir_img, dir_mask, img_scale)
+        dataset = SkyDataset(dir_img, dir_mask, img_scale)
     except (AssertionError, RuntimeError):
         dataset = BasicDataset(dir_img, dir_mask, img_scale)
 
@@ -73,6 +73,7 @@ def train_net(net,
     global_step = 0
 
     # 5. Begin training
+    epochs = 50
     for epoch in range(epochs):
         net.train()
         epoch_loss = 0
