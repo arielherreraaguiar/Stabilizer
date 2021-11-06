@@ -16,7 +16,7 @@ from utils.dice_score import dice_loss
 from evaluate import evaluate
 from unet import UNet
 
-dir_img = Path('/home/inge/Pytorch-UNet/data/imgs/skyfinder_images/')
+dir_img = Path('/home/inge/Pytorch-UNet/data/imgs/minidataset/')
 #print(dir_img)
 dir_mask = Path('/home/inge/Pytorch-UNet/data/masks/skyfinder_masks')
 dir_checkpoint = Path('./checkpoints/')
@@ -24,7 +24,7 @@ dir_checkpoint = Path('./checkpoints/')
 
 def train_net(net,
               device,
-              epochs: int = 1,
+              epochs: int = 5,
               batch_size: int = 1,
               learning_rate: float = 0.001,
               val_percent: float = 0.1,
@@ -68,6 +68,7 @@ def train_net(net,
     # 4. Set up the optimizer, the loss, the learning rate scheduler and the loss scaling for AMP
     optimizer = optim.RMSprop(net.parameters(), lr=learning_rate, weight_decay=1e-8, momentum=0.9)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)  # goal: maximize Dice score
+    #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1) 
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss()
     global_step = 0
@@ -75,6 +76,8 @@ def train_net(net,
     # 5. Begin training
     epochs = 50
     for epoch in range(epochs):
+        print(learning_rate)
+        print('***********')
         net.train()
         epoch_loss = 0
         with tqdm(total=n_train, desc='Epoch {}/{}'.format(epoch + 1,epochs), unit='img') as pbar:
